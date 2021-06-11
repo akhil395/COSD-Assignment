@@ -1,0 +1,9 @@
+#Python based lambda function to export all cloud watch alerts from specific AWS account on 1st of every month
+
+AS per my understanding we want to export/copy all the cloudwatch alerts from one specific AWS account to other.
+This task require cross-account sharing of the cloudwatch alerts to different AWS account based on account number.
+To do it i can only see the manual way to go to the cloudwatch setting & enabled the cross-acoount data-sharing.
+I'm unable to find any boto3 cloudwatch apis to achieve it.
+I'm putting the link of AWS docs for how to do it.
+
+AWS Doc: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html
