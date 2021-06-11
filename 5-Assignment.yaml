@@ -1,0 +1,104 @@
+# 5. Using Cloudformation, deploy a Lambda which set Lifecyle policy on any bucket which has some data in incomplete multipart uploads
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloudformation template to create lambda function which delete incomplete multipart uploads
+
+Resources:
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: LambdaFunctionPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - s3:GetBucketPolicy
+              - s3:ListAllMyBuckets
+              - s3:ListBucket
+              - s3:ListMultipartUploadParts
+              - s3:PutBucketLogging
+              - s3:PutBucketPolicy
+              - s3:PutLifecycleConfiguration
+            Resource: '*'
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.6
+      Timeout: 5
+      Handler: index.handler
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Code:
+        ZipFile:  |
+            import boto3
+            from botocore.exceptions import ClientError
+
+            def delete_multipart_uploads(bucketname):
+                s3 = boto3.client('s3')
+                try:
+                    bucket_lifecycle_response = s3.get_bucket_lifecycle(Bucket=bucketname)
+                    rules = bucket_lifecycle_response["Rules"]
+                    # print(rules)
+                    lifecycle = {'Rules': rules}
+                except ClientError:
+                    lifecycle = {'Rules': []}
+                new_rule = {
+                    'ID': 'DeleteMultipartUploads_older_than_7_days',
+                    'Status': 'Enabled',
+                    'Prefix': '',
+                    'AbortIncompleteMultipartUpload': {
+                        'DaysAfterInitiation': 7
+                    }
+                }
+                if new_rule not in lifecycle["Rules"]:
+                    lifecycle['Rules'].append(new_rule)
+                try:
+                    response = s3.put_bucket_lifecycle(
+                        Bucket=bucketname, LifecycleConfiguration=lifecycle)
+                    if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                        print("Successfully updated Lifecycle Policy of Bucket : " + bucketname)
+
+                except ClientError:
+                    print("Something went worng for bucket : " + bucketname)
+                    print("Status code :" +
+                          str(response["ResponseMetadata"]["HTTPStatusCode"]))
+
+
+            def main():
+                print("Updating Policy for deleting multipart uploads")
+                delete_multipart_uploads("migration-snapshots")
+
+
+            if __name__ == "__main__":
+                main()
+
+
+            -
+              lambda_function_role_arn: !Ref LambdaFunctionRole
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: {Service: [lambda.amazonaws.com]}
+          Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
