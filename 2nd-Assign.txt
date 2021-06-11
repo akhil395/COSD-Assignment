@@ -1,4 +1,4 @@
-2. CLI command to extract idle RDS instances or use trusted advisor
+# 2. CLI command to extract idle RDS instances or use trusted advisor
 
 
 
