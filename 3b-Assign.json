@@ -1,0 +1,18 @@
+# Cloudwatch Event pattern for ELB. So whenever ELB creation take place the cloudwatch rule trigger lambda function.
+
+ {
+   "source": [
+     "aws.cloudtrail"
+   ],
+   "detail-type": [
+     "AWS API Call via CloudTrail"
+   ],
+   "detail": {
+     "eventSource": [
+       "cloudtrail.amazonaws.com"
+     ],
+     "eventName": [
+       "CreateLoadBalancer"
+     ]
+   }
+ }
