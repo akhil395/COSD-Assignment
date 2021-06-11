@@ -1,0 +1,13 @@
+# This the sample JSON file i used for updating the Password policy
+
+{
+	"MinimumPasswordLength": "12",
+	"RequireSymbols": true,
+	"RequireNumbers": true,
+	"RequireUppercaseCharacters": true,
+	"RequireLowercaseCharacters": true,
+	"AllowUsersToChangePassword": true,
+	"MaxPasswordAge": 90,
+	"PasswordReusePrevention": 180,
+	"HardExpiry": false
+}
