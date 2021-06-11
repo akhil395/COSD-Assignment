@@ -1,0 +1,5 @@
+2. CLI command to extract idle RDS instances or use trusted advisor
+
+
+
+aws rds describe-db-instances --region us-east-2 --output text --query 'DBInstances[*].[DBInstanceIdentifier]'  | xargs -t -I {}  aws cloudwatch get-metric-statistics --region us-east-2 --metric-name DatabaseConnections --start-time 2021-06-01 --end-time 2021-06-07 --period 86400 --namespace AWS/RDS --statistics Average  --output table --query 'Datapoints[?Average < `1`]' --dimensions Name=DBInstanceIdentifier,Value={}
