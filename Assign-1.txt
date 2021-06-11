@@ -1,4 +1,4 @@
-#Python based lambda function to export all cloud watch alerts from specific AWS account on 1st of every month
+# 1. Python based lambda function to export all cloud watch alerts from specific AWS account on 1st of every month
 
 AS per my understanding we want to export/copy all the cloudwatch alerts from one specific AWS account to other.
 This task require cross-account sharing of the cloudwatch alerts to different AWS account based on account number.
