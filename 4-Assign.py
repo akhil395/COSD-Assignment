@@ -1,4 +1,4 @@
-4. Using Python and boto3, update the IAM password policy on an account. The script should have a command line argument that contains a JSON object with the KWARGS needed for the password policy.
+# 4. Using Python and boto3, update the IAM password policy on an account. The script should have a command line argument that contains a JSON object with the KWARGS needed for the password policy.
 
 
 import boto3
